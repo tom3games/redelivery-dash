@@ -40,7 +40,9 @@ function resize() {
   // 縦長でも3レーンが見えるよう、縦画面はカメラを引いて視野を広げる
   CAM.fov = a < 1 ? clamp(2 * Math.atan(Math.tan(23 * Math.PI / 180) / a) * 180 / Math.PI, 56, 78) : 56
   const hh = Math.atan(Math.tan(CAM.fov * Math.PI / 360) * a)
-  CAM.back = clamp(2.15 / Math.tan(hh), 4.4, 6.4); CAM.h = 2.6 + CAM.back * 0.14
+  CAM.back = clamp(2.15 / Math.tan(hh), 4.4, 6.4); CAM.h = 2.6 + CAM.back * 0.14; CAM.port = a < 0.8
+  // 縦持ち: 近く・低めに寄せて主人公を下3分の1に大きく。左右はカメラが追うので3レーン全部を手前で映す必要はない
+  if (CAM.port) { CAM.fov = 64; CAM.back = 4.4; CAM.h = 2.35 }
   camera.fov = CAM.fov; camera.updateProjectionMatrix()
 }
 
@@ -385,7 +387,7 @@ function startStage(i) {
   if (!S.sim) for (const o of R.obs) makeObs(o, chunkFor(o.d))
   if (!S.sim) { if (player && player.parent) player.parent.remove(player); player = makeChar(st.outfit); world.add(player); S.snapCam = true }
   Object.assign(P, { d: 0, x: 0, lane: 1, y: 0, vy: 0, slide: 0, stun: 0, stunType: '', speed: 0, inv: 0, hits: 0, phase: 0, buf: null, bufT: 0, face: 'panic', spin: 0 })
-  S.mode = 'intro'; S.mt = 0; S.tutT = i === 0 ? 3.2 : 0
+  S.mode = 'intro'; S.mt = 0; S.tutT = i === 0 ? 3.0 : 0
   if (!S.sim) {
     go('vPlay'); $('#vPlay').classList.remove('oc'); $('#intro').hidden = false; $('#outc').hidden = true; $('#bNext').hidden = true; $('#dBub').hidden = true; $('#pBub').hidden = true; $('#blind').hidden = true; $('#tut').hidden = true
     $('#inNo').textContent = `${T('stage')} ${i + 1}`; $('#inSit').textContent = T('s_' + st.id); $('#inDing').textContent = ''; $('#stgNo').textContent = `${i + 1}/3`
@@ -466,6 +468,7 @@ function stepRun() {
 }
 function crash(o) {
   o.hit = true; P.hits++
+  if (S.tutT > 0) { S.tutT = 0; if (!S.sim) $('#tut').hidden = true } // 操作ガイドと擬音を重ねない
   const k = o.k, typ = { lego: 'agony', cat: 'trip', cable: 'trip', vacuum: 'trip', boxes: 'crash', clothes: 'tangle', laundry: 'blind' }[k]
   P.stun = D.HIT[k]; P.stunType = typ; P.slide = 0; P.spin = 0
   if (P.y > 0 && typ !== 'blind') { P.vy = Math.min(P.vy, 0) }
@@ -524,7 +527,7 @@ function stepOutcome() {
   if (t > 5.5) nextStage()
 }
 function showOutcome(ok) {
-  const r = S.results[S.idx], o = $('#outc'); o.hidden = false
+  const r = S.results[S.idx], o = $('#outc'); o.hidden = false; $('#dBub').hidden = true
   const big = $('#ocBig'), card = $('#ocCard')
   big.textContent = ok ? T('gotIt') : (S.lang === 'ja' ? '不在票…' : 'MISSED...'); big.className = 'big ' + (ok ? 'ok' : 'ng')
   card.className = 'card' + (ok ? '' : ' ng')
@@ -690,7 +693,12 @@ function toast(s) { const d = document.createElement('div'); d.className = 'toas
 // ---------- 吹き出し・擬音
 let bubT = 0
 function say(s, dur) { const b = $('#pBub'); b.textContent = s; b.hidden = false; bubT = dur }
-function ono(s, pain) { const d = document.createElement('div'); d.className = 'ono' + (pain ? ' pain' : ''); d.textContent = s; const p = screenOf(P.x, 1.9, -P.d); d.style.left = '50%'; d.style.fontSize = Math.min(innerWidth * 0.86 / Math.max(4, [...s].length), innerHeight * 0.1, 76) + 'px'; d.style.top = clamp(p.y - 60, 170, innerHeight - 180) + 'px'; $('#fx').appendChild(d); setTimeout(() => d.remove(), 1000) }
+function ono(s, pain) { const d = document.createElement('div'); d.className = 'ono' + (pain ? ' pain' : ''); d.textContent = s; const p = screenOf(P.x, 2.0, -P.d), fs = Math.min(innerWidth * 0.84 / Math.max(4, [...s].length), innerHeight * 0.075, 64); d.style.left = '50%'; d.style.fontSize = fs + 'px'
+  // 主人公の頭の上（自分の一言の吹き出しのさらに上）。上のゲージ・配達員のセリフの帯には入れない
+  const wEst = fs * [...s].length; let topMin = 0
+  for (const sel of ['.hud', '#dBub']) { const e = $(sel); if (!e || e.hidden) continue; const r = e.getBoundingClientRect(); if (r.width && r.right > (innerWidth - wEst) / 2 && r.left < (innerWidth + wEst) / 2) topMin = Math.max(topMin, r.bottom) }
+  topMin += fs * 0.7 + wEst * 0.08 + 6
+  d.style.top = clamp(p.y - 80 - fs / 2, topMin, innerHeight - 120) + 'px'; $('#fx').appendChild(d); setTimeout(() => d.remove(), 1000) }
 const _v = new THREE.Vector3()
 function screenOf(x, y, z) { _v.set(x, y, z).project(camera); return { x: (_v.x + 1) / 2 * innerWidth, y: (1 - _v.y) / 2 * innerHeight } }
 
@@ -729,7 +737,8 @@ function render(rt) {
     else { px = 0.7; py = 1.05; pz = -(L + 0.75); lx = -0.1; ly = 0.35; lz = -(L - 2.2) } // ドアの内側から、床の不在票とうなだれる人
     if (S.view === 'result') { const a = t * 0.2; px += Math.sin(a) * 0.4 }
   } else {
-    px = P.x * 0.55; py = CAM.h + P.y * 0.3; pz = -P.d + CAM.back; lx = P.x * 0.35; ly = 0.9; lz = -P.d - 7
+    if (CAM.port) { px = P.x * 0.8; py = CAM.h + P.y * 0.3; pz = -P.d + CAM.back; lx = P.x * 0.6; ly = 0.75; lz = -P.d - 10 }
+    else { px = P.x * 0.55; py = CAM.h + P.y * 0.3; pz = -P.d + CAM.back; lx = P.x * 0.35; ly = 0.9; lz = -P.d - 7 }
   }
   if (S.camOv) { [px, py, pz] = S.camOv.p; [lx, ly, lz] = S.camOv.l; S.snapCam = true }
   const k = S.mode === 'run' && S.view === 'play' ? 0.14 : 0.06
@@ -774,7 +783,13 @@ function hud() {
   $('#patMouth').setAttribute('d', fr < 0.25 ? 'M12 25q4-4 8 0' : fr < 0.5 ? 'M12 24h8' : 'M12 23q4 3 8 0')
   $('#progMan').style.left = (clamp(P.d / (R.st ? R.st.len : 1), 0, 1) * 100).toFixed(1) + '%'
   const b = $('#pBub')
-  if (!b.hidden) { const p = screenOf(P.x, 2.2 + P.y, -P.d); b.style.left = clamp(p.x, 90, innerWidth - 90) + 'px'; b.style.top = clamp(p.y, 150, innerHeight - 100) + 'px' }
+  if (!b.hidden) {
+    const p = screenOf(P.x, 2.2 + P.y, -P.d); b.style.left = clamp(p.x, 90, innerWidth - 90) + 'px'; let top = clamp(p.y, 150, innerHeight - 100); b.style.top = top + 'px'
+    // 擬音・配達員のセリフ・ゲージと重なったら、その下へずらす
+    const bh = b.offsetHeight, bw = b.offsetWidth, bl = parseFloat(b.style.left) - bw / 2
+    for (const e of [...$$('#fx .ono'), $('.hud'), $('#dBub')]) { if (!e || e.hidden) continue; const r = e.getBoundingClientRect(); if (!r.width) continue; if (bl < r.right && r.left < bl + bw && top - bh < r.bottom && r.top < top) top = r.bottom + bh + 6 }
+    b.style.top = Math.min(top, innerHeight - 90) + 'px'
+  }
 }
 
 // ---------- 画面切替・文言

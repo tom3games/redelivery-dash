@@ -240,7 +240,7 @@ const dist = await p.evaluate(() => {
   return out
 })
 notes.push('bots(100 runs each) ' + JSON.stringify(dist))
-await t('難しさ: 上手いは最高ランク「玄関の鬼」がたまに（10〜50%）、ほぼ受け取れる', async () => { const d = dist.good; expect(d.tally.oni >= 10 && d.tally.oni <= 50 && d.got >= 2.3, d); return d })
+await t('難しさ: 上手いは最高ランク「玄関の鬼」がたまに（15〜35%）、ほぼ受け取れる', async () => { const d = dist.good; expect(d.tally.oni >= 15 && d.tally.oni <= 35 && d.got >= 2.3, d); return d })
 await t('難しさ: ふつうは中間（ギリ在宅・居留守が一番多い）', async () => { const d = dist.normal, mid = d.tally.giri + d.tally.rusu; expect(mid >= 45 && d.tally.oni <= 10 && d.got > 1 && d.got < 2.4, d); return d })
 await t('難しさ: 雑は低い（不在票コレクター・居留守が大半）', async () => { const d = dist.sloppy; expect(d.tally.col + d.tally.rusu >= 80 && d.tally.oni === 0, d); return d })
 await t('難しさ: 何もしないと全部不在票', async () => { const d = dist.none; expect(d.tally.col === 100, d); return d })

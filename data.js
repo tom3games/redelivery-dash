@@ -2,9 +2,9 @@
 window.RD_DATA = {
   // ステージ: 状況・服・距離・速さ・配達員の待ち時間（秒）
   STAGES: [
-    { id: 'game', outfit: 'hoodie', len: 100, speed: 7.0, wait: 16.0, gap: [7.6, 9.9], mix: ['clothes', 'cable', 'cat', 'boxes', 'lego', 'laundry', 'vacuum'] },
-    { id: 'noodle', outfit: 'tee', len: 118, speed: 7.8, wait: 16.7, gap: [6.8, 8.8], mix: ['clothes', 'cable', 'cat', 'boxes', 'lego', 'laundry', 'vacuum', 'boxes2', 'lego2'] },
-    { id: 'bath', outfit: 'robe', len: 136, speed: 8.5, wait: 17.4, gap: [6.2, 7.9], mix: ['clothes', 'cable', 'cat', 'boxes', 'lego', 'laundry', 'vacuum', 'boxes2', 'lego2', 'combo'] },
+    { id: 'game', outfit: 'hoodie', len: 100, speed: 7.0, wait: 16.3, gap: [6.84, 8.91], mix: ['clothes', 'cable', 'cat', 'boxes', 'lego', 'laundry', 'vacuum'] },
+    { id: 'noodle', outfit: 'tee', len: 118, speed: 7.8, wait: 17.0, gap: [6.12, 7.92], mix: ['clothes', 'cable', 'cat', 'boxes', 'lego', 'laundry', 'vacuum', 'boxes2', 'lego2'] },
+    { id: 'bath', outfit: 'robe', len: 136, speed: 8.5, wait: 17.7, gap: [5.6, 7.11], mix: ['clothes', 'cable', 'cat', 'boxes', 'lego', 'laundry', 'vacuum', 'boxes2', 'lego2', 'combo'] },
   ],
   // ぶつかった時の止まる秒数
   HIT: { clothes: 0.7, cable: 1.0, cat: 1.0, boxes: 1.2, lego: 1.45, laundry: 0.8, vacuum: 0.9 },
