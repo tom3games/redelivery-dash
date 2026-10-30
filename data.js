@@ -32,7 +32,8 @@ window.RD_DATA = {
   TXT: {
     ja: {
       title1: '再配達は', title2: 'イヤだ！', tag: 'チャイムが鳴った。宅配便が帰る前に、玄関まで走れ。',
-      play: 'あそぶ', how: '遊び方', back: 'もどる', again: 'もう一回', save: '画像を保存', toTitle: 'タイトル', resume: 'つづける', paused: 'ちょっと休憩',
+      play: 'あそぶ', how: '遊び方', back: 'もどる', again: 'もう一回', save: '画像を保存', toTitle: 'タイトル', postX: 'Xでポスト',
+      xText: '再配達はイヤだ！ 3個中{got}個受け取って、称号は「{title}」でした #再配達はイヤだ', resume: 'つづける', paused: 'ちょっと休憩',
       howT: '遊び方',
       h1b: '玄関まで走れ', h1p: '前には勝手に走る。配達員さんのゲージが0になる前に玄関へ。',
       h2b: 'よけ方は3つ', h2p: '段ボールは横へ。服・コード・猫・レゴはジャンプ。部屋干しはスライディング。',
@@ -57,7 +58,8 @@ window.RD_DATA = {
     },
     en: {
       title1: "DON'T LEAVE,", title2: 'DELIVERY GUY', tag: 'The doorbell rang. Run to the door before the driver gives up.',
-      play: 'PLAY', how: 'HOW TO PLAY', back: 'BACK', again: 'PLAY AGAIN', save: 'SAVE IMAGE', toTitle: 'TITLE', resume: 'RESUME', paused: 'PAUSED',
+      play: 'PLAY', how: 'HOW TO PLAY', back: 'BACK', again: 'PLAY AGAIN', save: 'SAVE IMAGE', toTitle: 'TITLE', postX: 'Post on X',
+      xText: 'I got {got}/3 packages in DON\'T LEAVE, DELIVERY GUY. Title: "{title}" #DontLeaveDeliveryGuy', resume: 'RESUME', paused: 'PAUSED',
       howT: 'How to play',
       h1b: 'Run to the door', h1p: 'You run forward on your own. Reach the door before the patience bar hits zero.',
       h2b: 'Three ways to dodge', h2p: 'Boxes: move aside. Clothes, cables, cat, LEGO: jump. Drying laundry: slide.',

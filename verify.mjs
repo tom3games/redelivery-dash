@@ -58,6 +58,34 @@ const glVariance = p => p.evaluate(() => {
   let s = 0, s2 = 0, n = 0; for (let i = 0; i < d.length; i += 4 * 7) { const v = d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11; s += v; s2 += v * v; n++ }
   return Math.round(s2 / n - (s / n) ** 2)
 })
+// ---- Xでポスト の検査道具
+// window.open をスタブして押す → 開いたURLを分解して確かめる
+const xStub = async (pg, ns, pub, tag) => {
+  await pg.evaluate(() => { window.__opened = []; if (!window.__origOpen) window.__origOpen = window.open; window.open = (...a) => { window.__opened.push(a); return null } })
+  const vis = await pg.evaluate(() => { const b = document.querySelector('#bX'), r = b.getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), inView: r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth, clip: b.scrollWidth > b.clientWidth + 1, bg: getComputedStyle(b).backgroundColor, label: b.textContent.trim(), svg: !!b.querySelector('svg path') } })
+  await pg.click('#bX')
+  const r = await pg.evaluate(ns => ({ opened: window.__opened, text: window[ns].xText(), url: window[ns].xUrl() }), ns)
+  await pg.evaluate(() => { window.open = window.__origOpen })
+  expect(r.opened.length === 1, r)
+  const [u, target, feat] = r.opened[0], q = new URL(u)
+  const text = q.searchParams.get('text'), url = q.searchParams.get('url')
+  expect(u.startsWith('https://x.com/intent/post?') && target === '_blank' && /noopener/.test(feat || '') && u === r.url, r.opened[0])
+  expect(text === r.text && text.includes(tag) && (text.match(/#/g) || []).length === 1 && url === pub && !/https?:\/\//.test(text), { text, url })
+  expect(vis.inView && !vis.clip && vis.svg && vis.bg === 'rgb(0, 0, 0)' && vis.h >= 36, vis)
+  return { label: vis.label, text }
+}
+// 本物のクリックで新しいタブ（popup）が開く。x.com へは出ずにダミーを返す
+const xPopup = async (pg, pub) => {
+  await pg.context().route(/^https:\/\/x\.com\//, r => r.fulfill({ status: 200, contentType: 'text/html', body: '<title>x</title>ok' }))
+  const [pop] = await Promise.all([pg.waitForEvent('popup', { timeout: 8000 }), pg.click('#bX')])
+  await pop.waitForLoadState().catch(() => {})
+  const u = new URL(pop.url()); await pop.close()
+  expect(u.origin + u.pathname === 'https://x.com/intent/post' && u.searchParams.get('url') === pub && u.searchParams.get('text'), pop.url())
+  return u.searchParams.get('text')
+}
+// 結果画面のボタンの文字が切れていない
+const btnClip = pg => pg.evaluate(() => [...document.querySelectorAll('#vResult button')].filter(b => b.offsetParent && b.scrollWidth > b.clientWidth + 1).map(b => b.id + ':' + b.scrollWidth + '>' + b.clientWidth))
+const PUB = 'https://tom3games.github.io/redelivery-dash/'
 const SIZES = [[360, 640, 'small'], [390, 844, 'phone'], [844, 390, 'land'], [667, 375, 'land-se'], [768, 1024, 'tab'], [1440, 900, 'pc']]
 const GPU = { args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] }
 
@@ -220,6 +248,20 @@ await t('結果を画像に保存（1080x1350・ダウンロードされる）',
   const r = await p.evaluate(async () => { const c = rd.buildCard(); const x = c.getContext('2d'); const d = x.getImageData(0, 0, c.width, c.height).data; let s = 0, s2 = 0, n = 0; for (let i = 0; i < d.length; i += 4 * 97) { const v = d[i] * .3 + d[i + 1] * .59 + d[i + 2] * .11; s += v; s2 += v * v; n++ } return { w: c.width, h: c.height, v: Math.round(s2 / n - (s / n) ** 2) } })
   expect(dl.suggestedFilename() === 'redelivery-dash.png' && r.w === 1080 && r.h === 1350 && r.v > 500, r); return { file: dl.suggestedFilename(), ...r }
 })
+await t('Xでポスト: 日本語（ボタンが見える・x.com/intent/post・本文に受け取り数と称号とハッシュタグ・url=公開URL）', async () => {
+  const r = await xStub(p, 'rd', PUB, '#再配達はイヤだ')
+  const n = await p.evaluate(() => [document.querySelector('#nGot').textContent, document.querySelector('#hTitle').textContent])
+  expect(r.label === 'Xでポスト' && r.text.includes('3個中' + n[0] + '個') && r.text.includes('「' + n[1] + '」'), { r, n }); return r.text
+})
+await t('Xでポスト: 本物のクリックで新しいタブが開く', async () => { const tx = await xPopup(p, PUB); expect(/#再配達はイヤだ/.test(tx), tx); return tx.length })
+await t('Xでポスト: 英語', async () => {
+  await p.click('#bLang')
+  const r = await xStub(p, 'rd', PUB, '#DontLeaveDeliveryGuy')
+  const n = await p.evaluate(() => [document.querySelector('#nGot').textContent, document.querySelector('#hTitle').textContent])
+  await p.screenshot({ path: ROOT + '/shots/12-result-en-x.png' })
+  await p.click('#bLang')
+  expect(r.label === 'Post on X' && r.text.includes(n[0] + '/3') && r.text.includes(n[1]) && !/[ぁ-んァ-ン一-龥]/.test(r.text), { r, n }); return r.text
+})
 await t('もう一回ですぐ遊べる（ステージ1から・前の結果は消える）', async () => {
   await p.click('#bAgain'); const r = await p.evaluate(() => ({ idx: rd.S.idx, mode: rd.S.mode, res: rd.S.results.length, view: rd.S.view })); expect(r.idx === 0 && r.mode === 'intro' && r.res === 0 && r.view === 'play', r); return r
 })
@@ -283,6 +325,9 @@ for (const [w, h, name] of SIZES) {
     await q.evaluate(() => { rd.dbg.pause(true); rd.R.obs.forEach(o => o.hit = true); rd.P.d = rd.R.st.len - 0.3; rd.dbg.step(120); rd.dbg.render() }); views.outcome = await fit(q); await q.screenshot({ path: `${ROOT}/shots/fit-${tag}-outcome.png` })
     await q.evaluate(() => { rd.S.results = [{ ok: true, hits: 0, item: 1 }, { ok: false, hits: 2, item: -1 }, { ok: true, hits: 1, item: 8 }]; rd.showResult(); rd.dbg.step(60 * 4); rd.dbg.pause(false) }); await q.waitForTimeout(600)
     views.result = await fit(q); await q.screenshot({ path: `${ROOT}/shots/fit-${tag}-result.png` })
+    const clipJa = await btnClip(q)
+    await q.click('#bLang'); await q.waitForTimeout(200); views.resultEn = await fit(q); const clipEn = await btnClip(q); await q.screenshot({ path: `${ROOT}/shots/fit-${tag}-result-en.png` }); await q.click('#bLang')
+    await t(`${tag}: 結果画面のボタンの文字が切れない（日英）`, async () => { expect(!clipJa.length && !clipEn.length, [clipJa, clipEn]) })
     for (const [v, r] of Object.entries(views)) await t(`一画面に収まる ${tag} ${w}x${h} ${v}`, async () => { expect(!r.over.length, r) })
     await t(`${tag}: はみ出し・エラーなし`, async () => { const o = await overflow(q); expect(o.sw <= o.W && !o.bad.length && !q.errs.length, JSON.stringify(o) + q.errs.join('|')) })
     await q.close()

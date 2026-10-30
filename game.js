@@ -617,6 +617,10 @@ function stepResult() {
   }
   if (at(3.5)) { $('#rLine').classList.add('on'); $('#rBtns').classList.add('on') }
 }
+// Xでポスト: クリックの同期処理内で開く（ポップアップブロック回避）。URL は url パラメータで渡す
+const PUB_URL = 'https://tom3games.github.io/redelivery-dash/'
+function xText() { const res = S.results; if (!res || res.length < 3) return ''; const tt = titleOf(res); return T('xText').replace('{got}', res.filter(r => r.ok).length).replace('{title}', tt[S.lang]) }
+function xUrl() { return 'https://x.com/intent/post?text=' + encodeURIComponent(xText()) + '&url=' + encodeURIComponent(PUB_URL) }
 // 結果を1枚の画像に（不在票風）
 async function saveImage() {
   await cardFonts()
@@ -845,6 +849,7 @@ function boot() {
   on('#bNext', () => { Snd.sfx('tap'); nextStage() })
   on('#bAgain', () => { Snd.sfx('tap'); startGame() })
   on('#bSave', () => saveImage())
+  on('#bX', () => { window.open(xUrl(), '_blank', 'noopener') })
   on('#bTitle', () => { Snd.sfx('tap'); titleScene(); go('vTitle') })
   on('#bLang', () => { S.lang = S.lang === 'ja' ? 'en' : 'ja'; store.set('lang', S.lang); applyLang(); if (S.view === 'result') showResultTexts() })
   on('#bMute', () => { Snd.setMute(!Snd.muted); S.muted = Snd.muted; $('#icOn').hidden = Snd.muted; $('#icOff').hidden = !Snd.muted; store.set('mute', Snd.muted ? '1' : '0') })
@@ -879,7 +884,7 @@ function showResultTexts() {
 
 // 検証用の窓口
 window.rd = {
-  S, P, R, D, Snd, cardFonts, startGame, startStage, input, simulate, titleOf, buildCard, saveImage, genCourse, nextStage, showResult,
+  S, P, R, D, Snd, cardFonts, startGame, startStage, input, simulate, titleOf, buildCard, saveImage, xText, xUrl, PUB_URL, genCourse, nextStage, showResult,
   fps: () => fps,
   dbg: { pause: v => { dbgPause = v }, step: n => { for (let i = 0; i < n; i++) step() }, render: () => render(performance.now() / 1000), setBot: k => { S.bot = k ? { kind: k, rng: mulberry(99) } : null } },
 }
