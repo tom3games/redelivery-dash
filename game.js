@@ -589,6 +589,26 @@ function titleOf(res) {
 }
 
 // ---------- 結果
+// 称号の語のまとまり（英語は空白、日本語は jw の | で区切る）。この単位の途中では改行しない
+const titleWords = (tt, lang) => lang === 'ja' ? (tt.jw || tt.ja).split('|') : tt.en.split(' ').flatMap(w => w.replace(/-/g, '-\n').split('\n'))
+function setHankoTitle(tt) {
+  const b = $('#hTitle'); b.innerHTML = ''
+  titleWords(tt, S.lang).forEach((w, i, arr) => { if (i) b.append(S.lang === 'ja' || /-$/.test(arr[i - 1]) ? document.createElement('wbr') : ' '); const s = document.createElement('span'); s.className = 'w'; s.textContent = w; b.append(s) })
+  fitHanko()
+}
+// 丸の内側（内接する正方形くらい）に収まるまで字を小さくする
+function fitHanko() {
+  const hk = $('#hanko'), b = $('#hTitle'), sm = hk.querySelector('small'); if (!hk.offsetWidth || !b.firstChild) return
+  b.style.fontSize = ''
+  // 日本語は丸（内接する正方形くらいに収める）、英語は四角（横幅に収め、3行まで）
+  const round = S.lang === 'ja', lim = round ? hk.clientWidth * 0.74 : hk.clientWidth - 24
+  let fs = parseFloat(getComputedStyle(b).fontSize)
+  const over = () => Math.max(...[...b.querySelectorAll('.w')].map(s => s.offsetWidth)) > lim || (round ? sm.offsetHeight + b.offsetHeight > lim * 1.08 : b.offsetHeight > fs * 1.05 * 3 + 2)
+  while (fs > 8 && over()) { fs -= 0.5; b.style.fontSize = fs + 'px' }
+}
+addEventListener('resize', () => { if (S.view === 'result') fitHanko() })
+// 見出しの字体は使われた時に読み込まれ、読み込み後に幅が変わるので測り直す
+try { document.fonts.addEventListener('loadingdone', () => fitHanko()) } catch (e) {}
 function showResult() {
   S.mode = 'done'; go('vResult'); S.resT = 0; Snd.setTrack('result')
   const rows = $('#sRows'); rows.innerHTML = ''
@@ -600,7 +620,7 @@ function showResult() {
   })
   $('#nGot').textContent = '?'; $('#nMiss').textContent = '?'
   $('#hanko').className = 'hanko'; $('#rLine').classList.remove('on'); $('#rBtns').classList.remove('on'); $('#drum').hidden = false
-  const tt = titleOf(S.results); $('#hTitle').textContent = tt[S.lang]; $('#rLine').textContent = S.lang === 'ja' ? tt.jl : tt.el
+  const tt = titleOf(S.results); setHankoTitle(tt); $('#rLine').textContent = S.lang === 'ja' ? tt.jl : tt.el
   // 背景はドアの前
   if (player) { player.visible = true }
 }
@@ -674,7 +694,7 @@ function buildCard() {
   x.save(); x.translate(800, y2 + 60); x.rotate(-0.2); x.strokeStyle = x.fillStyle = '#d7263d'; x.lineWidth = 10
   x.beginPath(); x.arc(0, 0, 150, 0, 7); x.stroke(); x.lineWidth = 3; x.beginPath(); x.arc(0, 0, 134, 0, 7); x.stroke()
   x.textAlign = 'center'; x.font = `900 26px ${body}`; x.fillText(T('cardStamp'), 0, -70)
-  x.font = `${ja ? 52 : 30}px ${disp}`; wrapCenter(x, tt[S.lang], 0, 2, 230, ja ? 58 : 36)
+  x.font = `${ja ? 52 : 30}px ${disp}`; wrapCenter(x, x.measureText(tt[S.lang]).width <= 230 ? tt[S.lang] : titleWords(tt, S.lang), 0, 2, 230, ja ? 58 : 36)
   x.restore()
   x.restore()
   x.textAlign = 'center'; x.fillStyle = '#b9aec8'; x.font = `800 26px ${body}`; x.fillText('tom3games.github.io/redelivery-dash', W / 2, H - 16)
@@ -687,9 +707,12 @@ async function cardFonts() {
 }
 function fitText(x, s, px, py, maxW) { const f = x.font; let size = parseInt(f.match(/(\d+)px/)[1]); while (x.measureText(s).width > maxW && size > 18) { size -= 2; x.font = f.replace(/\d+px/, size + 'px') } x.fillText(s, px, py) }
 function wrapCenter(x, s, cx, cy, maxW, lh) {
-  if (x.measureText(s).width <= maxW) { x.fillText(s, cx, cy + lh * 0.35); return }
-  const words = s.includes(' ') ? s.split(' ') : [...s]; const lines = []; let cur = ''
-  for (const w of words) { const t = cur ? cur + (s.includes(' ') ? ' ' : '') + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w } else cur = t }
+  if (!Array.isArray(s) && x.measureText(s).width <= maxW) { x.fillText(s, cx, cy + lh * 0.35); return }
+  const sep = Array.isArray(s) ? (/^[\x00-\x7f]+$/.test(s.join('')) ? ' ' : '') : s.includes(' ') ? ' ' : ''
+  const words = Array.isArray(s) ? s : s.includes(' ') ? s.split(' ') : [...s]; const lines = []; let cur = ''
+  // 1語が枠より広い時は字を小さくする（語の途中では折らない）
+  const wMax = Math.max(...words.map(w => x.measureText(w).width)); if (wMax > maxW) { const m = /([\d.]+)px/.exec(x.font); x.font = x.font.replace(m[0], (+m[1] * maxW / wMax).toFixed(1) + 'px'); lh *= maxW / wMax }
+  for (const w of words) { const t = cur ? cur + (/-$/.test(cur) ? '' : sep) + w : w; if (x.measureText(t).width > maxW && cur) { lines.push(cur); cur = w } else cur = t }
   lines.push(cur); lines.forEach((l, i) => x.fillText(l, cx, cy + (i - (lines.length - 1) / 2) * lh + lh * 0.35))
 }
 function toast(s) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = s; document.body.appendChild(d); setTimeout(() => d.remove(), 1600) }
@@ -878,13 +901,13 @@ function boot() {
   window.__rdReady = true
 }
 function showResultTexts() {
-  const tt = titleOf(S.results); $('#hTitle').textContent = tt[S.lang]; $('#rLine').textContent = S.lang === 'ja' ? tt.jl : tt.el
+  const tt = titleOf(S.results); setHankoTitle(tt); $('#rLine').textContent = S.lang === 'ja' ? tt.jl : tt.el
   $$('.sRow').forEach((d, i) => { const r = S.results[i], it = r.ok ? D.ITEMS[r.item] : null; d.querySelector('.it').innerHTML = `${it ? it[S.lang] : T('missed').replace('…', '').replace('...', '')}<small>${T('s_' + D.STAGES[i].id)} / ${T('hits')} ${r.hits}</small>`; d.querySelector('.tag').textContent = r.ok ? T('cardGot') : T('cardMiss') })
 }
 
 // 検証用の窓口
 window.rd = {
-  S, P, R, D, Snd, cardFonts, startGame, startStage, input, simulate, titleOf, buildCard, saveImage, xText, xUrl, PUB_URL, genCourse, nextStage, showResult,
+  S, P, R, D, Snd, cardFonts, startGame, startStage, input, simulate, titleOf, titleWords, fitHanko, setHankoTitle, buildCard, saveImage, xText, xUrl, PUB_URL, genCourse, nextStage, showResult,
   fps: () => fps,
   dbg: { pause: v => { dbgPause = v }, step: n => { for (let i = 0; i < n; i++) step() }, render: () => render(performance.now() / 1000), setBot: k => { S.bot = k ? { kind: k, rng: mulberry(99) } : null } },
 }

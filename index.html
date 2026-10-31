@@ -169,12 +169,15 @@ html[lang=en] .intro .ding{font-size:clamp(38px,min(12vw,11vh),90px)}
 .sNums span{display:block;font-size:10.5px;font-weight:800;color:#6a6076;white-space:nowrap}
 .sNums b{display:block;font-family:var(--disp);font-weight:400;font-size:24px;line-height:1.15}
 .sNums .g b{color:var(--ok-dk)} .sNums .m b{color:var(--slip-dk)}
-.hanko{flex:none;width:clamp(104px,30vw,128px);height:clamp(104px,30vw,128px);border-radius:50%;border:5px solid #d7263d;color:#d7263d;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:rotate(-12deg);background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 3px rgba(215,38,61,.35);opacity:0;padding:6px}
+.hanko{flex:none;width:clamp(104px,30vw,128px);height:clamp(104px,30vw,128px);border-radius:50%;border:5px solid #d7263d;color:#d7263d;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transform:rotate(var(--hr,-12deg));background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 3px rgba(215,38,61,.35);opacity:0;padding:6px}
+/* 英語は四角いゴム印（丸に英単語は入らない） */
+html[lang=en] .hanko{--hr:-7deg;width:clamp(128px,38vw,168px);height:auto;min-height:72px;border-radius:10px;padding:6px 10px}
 .hanko small{font-size:10px;font-weight:900;letter-spacing:.1em;border-bottom:2px solid currentColor;margin-bottom:3px}
-.hanko b{font-family:var(--disp);font-weight:400;font-size:clamp(17px,5vw,21px);line-height:1.1}
-html[lang=en] .hanko b{font-size:clamp(12px,3.4vw,14px)}
+.hanko b{overflow-wrap:normal;word-break:normal;font-family:var(--disp);font-weight:400;font-size:clamp(17px,5vw,21px);line-height:1.1}
+html[lang=en] .hanko b{font-size:clamp(14px,4.2vw,18px);line-height:1.05}
+.hanko b .w{white-space:nowrap}
 .hanko.show{opacity:1;animation:stampIn .45s cubic-bezier(.2,1.6,.4,1) both}
-@keyframes stampIn{from{transform:rotate(-12deg) scale(3);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
+@keyframes stampIn{from{transform:rotate(var(--hr,-12deg)) scale(3);opacity:0}to{transform:rotate(var(--hr,-12deg)) scale(1);opacity:1}}
 .rLine{position:relative;font-weight:800;font-size:13px;color:#4a4256;text-align:center;padding:6px 12px 0;min-height:1.6em}
 .drum{position:absolute;right:16px;bottom:30px;font-weight:900;font-size:13px;color:var(--slip-dk);animation:blink .4s steps(2) infinite}
 @keyframes blink{50%{opacity:.2}}
@@ -207,6 +210,7 @@ html[lang=en] .hanko b{font-size:clamp(12px,3.4vw,14px)}
   .sRows{padding:6px 10px 2px;gap:3px}.sRow{padding:2px 8px}.sRow .it{font-size:12.5px}.sRow .it small{display:none}
   .sMid{padding:4px 10px 0}.sNums b{font-size:18px}.sNums div{padding:2px 8px;min-width:62px}
   .hanko{width:88px;height:88px;border-width:4px}.hanko b{font-size:15px}
+  html[lang=en] .hanko{width:136px;height:auto;min-height:60px}html[lang=en] .hanko b{font-size:14px}
   .rLine{font-size:12px;padding-top:2px}
   .rBtns .btn{min-height:44px;font-size:15px}.rBtns .btn.red{min-height:50px;font-size:17px}
   .rBtns{display:flex;flex-direction:column;gap:6px}.rBtns .row{display:contents}
@@ -334,8 +338,8 @@ html[lang=en] .hanko b{font-size:clamp(12px,3.4vw,14px)}
   },8000);
 })();
 </script>
-<script src="data.js?v=2"></script>
-<script src="snd.js?v=2"></script>
-<script type="module" src="game.js?v=2"></script>
+<script src="data.js?v=3"></script>
+<script src="snd.js?v=3"></script>
+<script type="module" src="game.js?v=3"></script>
 </body>
 </html>

@@ -22,12 +22,13 @@ window.RD_DATA = {
     { ja: '高級ちくわ 30本', en: '30 luxury fish sticks', jc: '冷蔵庫に入らない。', ec: 'Will not fit the fridge.' },
   ],
   // 称号（上から判定）
+  // jw: ハンコで改行してよい所（| で区切る。語の途中では折らない）
   TITLES: [
-    { id: 'oni', ja: '玄関の鬼', en: 'DOORSTEP DEMON', jl: 'チャイムが鳴る前に玄関にいる人。', el: 'At the door before the bell rings.' },
-    { id: 'ace', ja: 'ピンポン即応マン', en: 'DING-DONG RESPONDER', jl: '配達員さんに顔を覚えられた。', el: 'The driver knows your face now.' },
-    { id: 'giri', ja: 'ギリ在宅', en: 'BARELY HOME', jl: '2勝1敗。明日も来てもらう。', el: 'See you again tomorrow, driver.' },
-    { id: 'rusu', ja: '居留守の才能', en: 'NATURAL NO-SHOW', jl: '家にいたのに、いないことになった。', el: 'You were home. Officially, you were not.' },
-    { id: 'col', ja: '不在票コレクター', en: 'MISSED-SLIP COLLECTOR', jl: '冷蔵庫が不在票で埋まる。', el: 'Your fridge is covered in slips.' },
+    { id: 'oni', ja: '玄関の鬼', jw: '玄関の鬼', en: 'DOORSTEP DEMON', jl: 'チャイムが鳴る前に玄関にいる人。', el: 'At the door before the bell rings.' },
+    { id: 'ace', ja: 'ピンポン即応マン', jw: 'ピンポン|即応マン', en: 'DING-DONG RESPONDER', jl: '配達員さんに顔を覚えられた。', el: 'The driver knows your face now.' },
+    { id: 'giri', ja: 'ギリ在宅', jw: 'ギリ|在宅', en: 'BARELY HOME', jl: '2勝1敗。明日も来てもらう。', el: 'See you again tomorrow, driver.' },
+    { id: 'rusu', ja: '居留守の才能', jw: '居留守の|才能', en: 'NATURAL NO-SHOW', jl: '家にいたのに、いないことになった。', el: 'You were home. Officially, you were not.' },
+    { id: 'col', ja: '不在票コレクター', jw: '不在票|コレクター', en: 'MISSED-SLIP COLLECTOR', jl: '冷蔵庫が不在票で埋まる。', el: 'Your fridge is covered in slips.' },
   ],
   TXT: {
     ja: {

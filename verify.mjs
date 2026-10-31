@@ -86,6 +86,24 @@ const xPopup = async (pg, pub) => {
 // 結果画面のボタンの文字が切れていない
 const btnClip = pg => pg.evaluate(() => [...document.querySelectorAll('#vResult button')].filter(b => b.offsetParent && b.scrollWidth > b.clientWidth + 1).map(b => b.id + ':' + b.scrollWidth + '>' + b.clientWidth))
 const PUB = 'https://tom3games.github.io/redelivery-dash/'
+// 称号ハンコ: 全称号 × 日英で、語のまとまりの途中で改行しない・枠からはみ出さない
+const HANKO = async () => {
+  const bad = [], lang0 = rd.S.lang
+  for (const lang of ['ja', 'en']) {
+    rd.S.lang = lang; document.documentElement.lang = lang
+    for (const tt of rd.D.TITLES) {
+      rd.setHankoTitle(tt); await document.fonts.ready; rd.fitHanko()
+      const hk = document.querySelector('#hanko'), b = document.querySelector('#hTitle'), sm = hk.querySelector('small'), en = lang === 'en', lim = en ? hk.clientWidth - 20 : hk.clientWidth * 0.78
+      const ws = [...b.querySelectorAll('.w')]
+      if (ws.map(w => w.textContent).join(en ? ' ' : '').replace(/- /g, '-') !== tt[lang]) bad.push(`${lang}/${tt.id} text ${b.textContent}`)
+      for (const w of ws) { if (new Set([...w.getClientRects()].map(x => Math.round(x.top))).size > 1) bad.push(`${lang}/${tt.id} break ${w.textContent}`); if (w.offsetWidth > lim) bad.push(`${lang}/${tt.id} wide ${w.textContent}`) }
+      if (!en && sm.offsetHeight + b.offsetHeight > lim * 1.12) bad.push(`${lang}/${tt.id} tall`)
+      if (parseFloat(getComputedStyle(b).fontSize) < 10) bad.push(`${lang}/${tt.id} tiny ${getComputedStyle(b).fontSize}`)
+    }
+  }
+  rd.S.lang = lang0; document.documentElement.lang = lang0; rd.setHankoTitle(rd.titleOf(rd.S.results))
+  return bad
+}
 const SIZES = [[360, 640, 'small'], [390, 844, 'phone'], [844, 390, 'land'], [667, 375, 'land-se'], [768, 1024, 'tab'], [1440, 900, 'pc']]
 const GPU = { args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist'] }
 
@@ -330,6 +348,7 @@ for (const [w, h, name] of SIZES) {
     await t(`${tag}: 結果画面のボタンの文字が切れない（日英）`, async () => { expect(!clipJa.length && !clipEn.length, [clipJa, clipEn]) })
     for (const [v, r] of Object.entries(views)) await t(`一画面に収まる ${tag} ${w}x${h} ${v}`, async () => { expect(!r.over.length, r) })
     await t(`${tag}: はみ出し・エラーなし`, async () => { const o = await overflow(q); expect(o.sw <= o.W && !o.bad.length && !q.errs.length, JSON.stringify(o) + q.errs.join('|')) })
+    await t(`${tag}: 称号ハンコの字が語の途中で折れない・はみ出さない（全称号×日英）`, async () => { const b = await q.evaluate(HANKO); expect(!b.length, b.slice(0, 4)) })
     await q.close()
   }
 }
