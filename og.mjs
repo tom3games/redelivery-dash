@@ -1,4 +1,5 @@
 // SNS用サムネ og.png（1200x630）。node og.mjs。遊んでいる一番おもしろい場面（レゴを踏んで悶絶）＋タイトル＋一言
+import './mute-auto.mjs'  // テスト中は絶対に音を出さない（playwright を無音に差し替え）
 import { chromium } from 'playwright'
 import { spawn } from 'node:child_process'
 import { createServer } from 'node:net'
