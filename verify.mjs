@@ -123,7 +123,7 @@ await t('ブラウザの拡大が起きない（viewport・ピンチ・Ctrl+ホ�
 })
 await t('OGP 一式があり、画像のURLが本番を指す', async () => {
   const r = await p.evaluate(() => ({ ks: ['og:title', 'og:description', 'og:image', 'og:url', 'og:type'].map(k => document.querySelector(`meta[property="${k}"]`)?.content || ''), tw: document.querySelector('meta[name="twitter:card"]')?.content }))
-  expect(r.ks.every(Boolean) && r.tw === 'summary_large_image' && r.ks[2] === 'https://tom3games.github.io/redelivery-dash/og.png?v=1' && r.ks[3] === 'https://tom3games.github.io/redelivery-dash/', r)
+  expect(r.ks.every(Boolean) && r.tw === 'summary_large_image' && r.ks[2] === 'https://tom3games.com/play/redelivery-dash/og.png?v=1' && r.ks[3] === 'https://tom3games.com/play/redelivery-dash/', r)
 })
 await t('og.png が 1200x630 で置いてある', async () => {
   const r = await p.evaluate(async () => { const b = await (await fetch('og.png')).blob(); const i = await createImageBitmap(b); return [i.width, i.height, b.size] })
