@@ -57,7 +57,7 @@ main.view{position:fixed;inset:0;z-index:2;height:100svh;overflow:hidden}
 #corner svg,#bPause svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 
 /* ---------- タイトル */
-#vTitle{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(58px,calc(env(safe-area-inset-top) + 52px)) 16px max(26px,calc(env(safe-area-inset-bottom) + 20px));background:linear-gradient(rgba(42,34,56,.62),rgba(42,34,56,0) 42%,rgba(42,34,56,0) 58%,rgba(42,34,56,.75))}
+#vTitle{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(58px,calc(env(safe-area-inset-top) + 52px)) 16px max(26px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 20px));background:linear-gradient(rgba(42,34,56,.62),rgba(42,34,56,0) 42%,rgba(42,34,56,0) 58%,rgba(42,34,56,.75))}
 .logo{text-align:center;line-height:1;position:relative}
 .logo .bell{position:absolute;left:-8px;top:-26px;font-family:var(--disp);font-size:clamp(14px,3.6vw,20px);color:var(--ink);background:var(--yel);padding:5px 10px;border-radius:12px;transform:rotate(12deg);box-shadow:0 3px 0 var(--yel-dk);animation:ding 1.6s ease-in-out infinite;white-space:nowrap}
 @keyframes ding{0%,60%,100%{transform:rotate(12deg)}66%{transform:rotate(2deg) scale(1.1)}72%{transform:rotate(20deg) scale(1.1)}78%{transform:rotate(6deg)}}
@@ -69,7 +69,7 @@ html[lang=en] .logo .l2{font-size:clamp(36px,min(11.4vw,8.5vh),84px)}
 .tBtns{width:min(380px,100%);display:flex;flex-direction:column;gap:12px}
 
 /* ---------- 遊び方 */
-#vHow{display:flex;align-items:center;justify-content:center;padding:max(56px,calc(env(safe-area-inset-top) + 50px)) 14px max(16px,calc(env(safe-area-inset-bottom) + 12px));background:rgba(26,20,36,.62)}
+#vHow{display:flex;align-items:center;justify-content:center;padding:max(56px,calc(env(safe-area-inset-top) + 50px)) 14px max(16px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 12px));background:rgba(26,20,36,.62)}
 .howCard{width:min(560px,100%);max-height:100%;background:var(--paper);color:var(--ink);border-radius:22px;padding:16px;box-shadow:0 8px 0 #b3a58e,0 18px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:10px;min-height:0}
 .howCard h2{font-family:var(--disp);font-weight:400;font-size:24px;text-align:center}
 .howList{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
@@ -113,7 +113,7 @@ html[lang=en] .logo .l2{font-size:clamp(36px,min(11.4vw,8.5vh),84px)}
 .blind svg{width:min(92vw,92vh);height:auto;animation:flap .25s ease-in-out infinite alternate}
 @keyframes flap{to{transform:rotate(4deg) scale(1.03)}}
 .blind span{position:absolute;font-family:var(--disp);font-size:clamp(26px,8vw,48px);color:#fff;-webkit-text-stroke:4px var(--slip-dk);paint-order:stroke fill;transform:rotate(-6deg)}
-.ctl{position:absolute;bottom:max(14px,calc(env(safe-area-inset-bottom) + 8px));display:flex;gap:12px}
+.ctl{position:absolute;bottom:max(14px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 8px));display:flex;gap:12px}
 .ctl.l{left:max(12px,env(safe-area-inset-left))}
 .ctl.r{right:max(12px,env(safe-area-inset-right))}
 .pad{width:70px;height:70px;border-radius:50%;border:0;background:rgba(34,28,46,.72);box-shadow:inset 0 0 0 3px rgba(255,248,236,.5),0 4px 0 rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--paper)}
@@ -122,7 +122,7 @@ html[lang=en] .logo .l2{font-size:clamp(36px,min(11.4vw,8.5vh),84px)}
 .pad.jp{box-shadow:inset 0 0 0 3px var(--sky),0 4px 0 rgba(0,0,0,.35);color:var(--sky)}
 .pad.sl{box-shadow:inset 0 0 0 3px var(--yel),0 4px 0 rgba(0,0,0,.35);color:var(--yel)}
 .pcmode .ctl,.oc .ctl{display:none}
-.keys{position:absolute;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap;background:rgba(34,28,46,.6);padding:3px 10px;border-radius:99px}
+.keys{position:absolute;left:50%;transform:translateX(-50%);bottom:max(12px,calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)));font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap;background:rgba(34,28,46,.6);padding:3px 10px;border-radius:99px}
 .spmode .keys{display:none}
 .tut{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 160px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:900;font-size:16px;background:rgba(34,28,46,.86);padding:10px 16px;border-radius:14px;white-space:nowrap;box-shadow:inset 0 0 0 2px var(--yel)}
 .tut svg{width:150px;height:48px}
@@ -143,7 +143,7 @@ html[lang=en] .intro .ding{font-size:clamp(38px,min(12vw,11vh),90px)}
 .outc .card b{display:block;font-size:clamp(17px,5vw,22px);font-weight:900;line-height:1.3}
 .outc .card i{display:block;font-style:normal;font-size:13px;font-weight:800;color:var(--slip-dk);margin-top:2px}
 .outc .card.ng{background:var(--slipbg);box-shadow:0 5px 0 var(--slip-dk),0 12px 26px rgba(0,0,0,.4)}
-#bNext{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(14px,calc(env(safe-area-inset-bottom) + 8px));width:auto;min-width:130px}
+#bNext{position:absolute;right:max(12px,env(safe-area-inset-right));bottom:max(14px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 8px));width:auto;min-width:130px}
 
 /* ---------- 一時停止 */
 #vPause{display:flex;align-items:center;justify-content:center;background:rgba(20,16,28,.7);padding:16px}
@@ -151,7 +151,7 @@ html[lang=en] .intro .ding{font-size:clamp(38px,min(12vw,11vh),90px)}
 .pCard h2{font-family:var(--disp);font-weight:400;font-size:34px;color:var(--yel)}
 
 /* ---------- 結果 */
-#vResult{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(54px,calc(env(safe-area-inset-top) + 50px)) 14px max(14px,calc(env(safe-area-inset-bottom) + 10px));background:rgba(26,20,36,.55)}
+#vResult{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(54px,calc(env(safe-area-inset-top) + 50px)) 14px max(14px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 10px));background:rgba(26,20,36,.55)}
 .rCard{width:min(440px,100%);max-height:100%;display:flex;flex-direction:column;gap:clamp(6px,1.2vh,10px);min-height:0}
 .slipCard{position:relative;background:var(--slipbg);color:var(--ink);border-radius:8px;padding:0 0 12px;box-shadow:0 7px 0 var(--slip-dk),0 16px 34px rgba(0,0,0,.45);overflow:hidden}
 .slipCard::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;background:repeating-linear-gradient(transparent 0 27px,rgba(168,40,60,.12) 27px 28px);pointer-events:none}
@@ -196,7 +196,7 @@ html[lang=en] .hanko b{font-size:clamp(14px,4.2vw,18px);line-height:1.05}
   .pad{width:62px;height:62px}.pad svg{width:32px;height:32px}
 }
 @media (max-height:560px) and (orientation:landscape){
-  #vTitle{flex-direction:row;justify-content:space-around;padding-top:max(48px,calc(env(safe-area-inset-top) + 40px));padding-bottom:max(20px,calc(env(safe-area-inset-bottom) + 14px))}
+  #vTitle{flex-direction:row;justify-content:space-around;padding-top:max(48px,calc(env(safe-area-inset-top) + 40px));padding-bottom:max(20px,calc(calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px)) + 14px))}
   .logo .l2{font-size:clamp(52px,19vh,100px)}
   html[lang=en] .logo .l2{font-size:clamp(32px,11vh,60px)}
   .logo .sub{max-width:44vw}
@@ -205,7 +205,7 @@ html[lang=en] .hanko b{font-size:clamp(14px,4.2vw,18px);line-height:1.05}
   .hi{flex-direction:column;text-align:center;gap:4px;padding:6px}
   .hi svg{width:40px;height:40px}.hi p{font-size:11px;line-height:1.35}.hi b{font-size:13px}
   .howCard{width:min(760px,100%);gap:6px;padding:10px 12px}.howCard h2{font-size:18px}.ctrl{font-size:12px;padding:5px 8px}
-  #vResult{padding:max(8px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) 14px;justify-content:center}
+  #vResult{padding:max(8px,env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) max(8px,calc(env(safe-area-inset-bottom) + var(--inapp-bot,0px))) 14px;justify-content:center}
   .rCard{width:min(720px,100%);display:grid;grid-template-columns:1.5fr 1fr;gap:10px;align-items:center}
   .slipCard{padding-bottom:6px}
   .sHead{padding:4px 10px;font-size:13px}
@@ -343,6 +343,6 @@ html[lang=en] .hanko b{font-size:clamp(14px,4.2vw,18px);line-height:1.05}
 <script src="data.js?v=3"></script>
 <script src="snd.js?v=3"></script>
 <script type="module" src="game.js?v=3"></script>
-<script src="support.js?v=4" data-ja="送料" data-en="the shipping fee"></script>
+<script src="support.js?v=5" data-ja="送料" data-en="the shipping fee"></script>
 </body>
 </html>
